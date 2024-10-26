@@ -60,8 +60,10 @@ jobs:
     steps:
       - name: Stop and remove containers, networks
         run: docker compose down
+        continue-on-error: true
       - name: Remove unused data
         run: docker system prune -a -f
+        continue-on-error: true
 
   deploy:
     runs-on: self-hosted
