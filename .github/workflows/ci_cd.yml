@@ -59,7 +59,7 @@ jobs:
     needs: build
     steps:
       - name: Stop and remove containers, networks
-        run: docker-compose down
+        run: docker compose down
       - name: Remove unused data
         run: docker system prune -a -f
 
@@ -69,11 +69,11 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
-      - name: docker-compose
+      - name: docker compose
         env:
           DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           REPOSITORY_NAME: ${{ github.event.repository.name }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: docker-compose up -d
+        run: docker compose up -d
   
