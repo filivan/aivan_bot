@@ -5,9 +5,8 @@ from loguru import logger
 
 router = Router()
 
+
 @router.message(CommandStart())
 async def cmd_start(message: Message):
     logger.info(f"User {message.from_user.id} started bot")
-    await message.answer(
-        "Привет, герой!"
-    )
+    await message.answer("Привет, герой!")

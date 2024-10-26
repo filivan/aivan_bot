@@ -1,19 +1,23 @@
 import asyncio
 from aiogram import Bot, Dispatcher
 from loguru import logger
-from handlers import base, transcript
+from handlers import base, speech, chat
 from settings import settings
 
 logger.add("log/log.debug", level="DEBUG")
 logger.add("log/log.warn", level="WARNING")
+
 
 # Запуск бота
 async def main():
     bot = Bot(token=settings.BOT_TOKEN)
     dp = Dispatcher()
 
-    dp.include_routers(transcript.router,
-                       base.router)
+    dp.include_routers(
+        base.router,
+        chat.router,
+        speech.router,
+    )
 
     # Альтернативный вариант регистрации роутеров по одному на строку
     # dp.include_router(questions.router)
