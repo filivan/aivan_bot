@@ -33,8 +33,8 @@ async def message_to_voice_with_transcription(message: Message):
         # # Delete the processing message
         # await bot.delete_message(chat_id=processing_msg.chat.id, message_id=processing_msg.message_id)
 
-    except Exception as e:
-        logger.exception(f"An error occurred")
+    except Exception:
+        logger.exception("An error occurred")
         # await message.reply(f"An error occurred: {str(e)}")
 
     # finally:
