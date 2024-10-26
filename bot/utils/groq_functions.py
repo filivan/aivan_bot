@@ -50,7 +50,7 @@ async def chat_completion(text: str) -> str:
             messages=[
                 {
                     "role": "system",
-                    "content": "you are a helpful assistant. If it needed, format content with HTML",
+                    "content": "you are a helpful assistant. If it needed, format content with MARKDOWN",
                 },
                 {
                     "role": "user",
