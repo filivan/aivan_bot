@@ -23,6 +23,6 @@ async def message_to_text_with_completion(message: Message):
         await message.reply(f"{completion}", parse_mode=ParseMode.MARKDOWN_V2)
         logger.info("Completion finished")
 
-    except Exception as e:
-        logger.exception(f"An error occurred")
-        await message.reply(f"An error occurred")
+    except Exception:
+        logger.exception("An error occurred")
+        await message.reply("An error occurred")
