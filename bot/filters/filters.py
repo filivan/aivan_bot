@@ -12,5 +12,16 @@ class MessageToBotFilter(BaseFilter):
             if message.reply_to_message is not None
             else False
         )
-        is_bot_mentioned = message.text.startswith(f"@{message.bot._me.username}")
-        return is_private | is_group & (is_reply | is_bot_mentioned)
+        is_bot_mentioned_in_text = (
+            message.text.startswith(f"@{message.bot._me.username}")
+            if message.text is not None
+            else False
+        )
+        is_bot_mentioned_in_caption = (
+            message.caption.startswith(f"@{message.bot._me.username}")
+            if message.caption is not None
+            else False
+        )
+        return is_private | is_group & (
+            is_reply | is_bot_mentioned_in_text | is_bot_mentioned_in_caption
+        )
