@@ -6,8 +6,6 @@ from loguru import logger
 client = AsyncGroq(
     api_key=settings.GROQ_API_KEY,
 )
-speech_model = "whisper-large-v3-turbo"
-chat_completion_model = "llama-3.2-90b-vision-preview"
 
 
 async def transcribe_voice(file_io: io.BytesIO) -> str:
@@ -25,17 +23,21 @@ async def transcribe_voice(file_io: io.BytesIO) -> str:
     Returns:
         str: The transcribed text if successful, or an error message if an exception occurs.
     """
-    logger.info("Send binary-voice file to Groq {model} model", model=speech_model)
+    logger.info(
+        "Send binary-voice file to Groq {model} model", model=settings.SPEECH_MODEL
+    )
     try:
         transcription = await client.audio.transcriptions.create(
             file=("voice.ogg", file_io),
-            model=speech_model,
+            model=settings.SPEECH_MODEL,
             language="ru",
         )
     except Exception as e:
         logger.exception(f"An error occurred while sending audio to Groq: {str(e)}")
         return "An error occurred while sending audio to Groq"
-    logger.info("Get transcription from Groq {model} model", model=speech_model)
+    logger.info(
+        "Get transcription from Groq {model} model", model=settings.SPEECH_MODEL
+    )
     return transcription.text
 
 
@@ -55,7 +57,8 @@ async def chat_completion(text: str) -> str:
         str: The completed text if successful, or an error message if an exception occurs.
     """
     logger.info(
-        "Send text to Groq chat completion {model} model", model=chat_completion_model
+        "Send text to Groq chat completion {model} model",
+        model=settings.CHAT_COMPLETION_MODEL,
     )
     try:
         completion = await client.chat.completions.create(
@@ -69,7 +72,7 @@ async def chat_completion(text: str) -> str:
                     "content": f"{text}",
                 },
             ],
-            model=chat_completion_model,
+            model=settings.CHAT_COMPLETION_MODEL,
             stream=False,
         )
     except Exception as e:
@@ -77,7 +80,7 @@ async def chat_completion(text: str) -> str:
         return "An error occurred while sending text to Groq"
     logger.info(
         "Get completion from Groq chat completion {model} model",
-        model=chat_completion_model,
+        model=settings.CHAT_COMPLETION_MODEL,
     )
     return completion.choices[0].message.content
 
@@ -100,7 +103,7 @@ async def image_completion(text: str | None, image_url: str) -> str:
     """
     logger.info(
         "Send image and text to Groq chat completion vision {model} model",
-        model=chat_completion_model,
+        model=settings.CHAT_COMPLETION_MODEL,
     )
     try:
         completion = await client.chat.completions.create(
@@ -121,7 +124,7 @@ async def image_completion(text: str | None, image_url: str) -> str:
                     ],
                 },
             ],
-            model=chat_completion_model,
+            model=settings.CHAT_COMPLETION_MODEL,
             stream=False,
         )
     except Exception as e:
@@ -129,6 +132,6 @@ async def image_completion(text: str | None, image_url: str) -> str:
         return "An error occurred while sending text to Groq"
     logger.info(
         "Get completion from Groq chat completion {model} model",
-        model=chat_completion_model,
+        model=settings.CHAT_COMPLETION_MODEL,
     )
     return completion.choices[0].message.content
