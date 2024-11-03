@@ -5,11 +5,18 @@ from handlers import base, speech, chat, vision
 from config import settings
 
 
-async def main():
+async def main() -> None:
+    """
+    Main entry point for the bot. Create a Bot and Dispatcher, include
+    all routers and start polling.
+    """
     bot = Bot(token=settings.BOT_TOKEN)
     dp = Dispatcher()
 
+    # Include all the routers
     dp.include_routers(base.router, chat.router, speech.router, vision.router)
+
+    # Remove existing webhook (skip current messages) and start polling
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
