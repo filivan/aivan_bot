@@ -1,16 +1,15 @@
 from aiogram import F, Router
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, ChatMemberUpdatedFilter, MEMBER
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, ChatMemberUpdated
+from aiogram.enums import ChatType
 from loguru import logger
 from keyboards import inline_get_access_keyboard
 from config import settings
 
 
 router = Router()
-
-AUTHORIZED_USERS = set()  # Store authenticated user IDs
 
 
 class AuthStates(StatesGroup):
@@ -54,7 +53,7 @@ async def request_password(callback: CallbackQuery, state: FSMContext):
 @router.message(AuthStates.waiting_for_password)
 async def check_password(message: Message, state: FSMContext):
     if message.text == settings.ACCESS_PASSWORD:
-        AUTHORIZED_USERS.add(message.from_user.id)
+        settings.AUTHORIZED_USERS_ID.add(message.from_user.id)
         await message.reply(
             "Доступ открыт! Теперь вы можете в полной мере пользоваться ботом и добавлять его в группы."
         )
@@ -65,3 +64,12 @@ async def check_password(message: Message, state: FSMContext):
             reply_markup=inline_get_access_keyboard,
         )
         await state.clear()  # Reset state in case of incorrect password
+
+
+@router.my_chat_member(
+    F.chat.type != ChatType.PRIVATE,
+    ChatMemberUpdatedFilter(member_status_changed=MEMBER),
+)
+async def added_to_group(event: ChatMemberUpdated) -> None:
+    logger.info(f"Bot was added to group {event.chat.id} by user {event.from_user.id}")
+    settings.AUTHORIZED_CHATS_ID.add(event.chat.id)

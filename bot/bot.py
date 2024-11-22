@@ -3,6 +3,7 @@ from aiogram import Bot, Dispatcher
 from loguru import logger
 from handlers import base, speech, chat, vision
 from config import settings
+from middlewares import AuthMiddleware
 
 
 async def main() -> None:
@@ -12,6 +13,7 @@ async def main() -> None:
     """
     bot = Bot(token=settings.BOT_TOKEN)
     dp = Dispatcher()
+    dp.update.middleware(AuthMiddleware())
 
     # Include all the routers
     dp.include_routers(base.router, chat.router, speech.router, vision.router)
