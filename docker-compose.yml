@@ -5,4 +5,5 @@ services:
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
       - GROQ_API_KEY=${GROQ_API_KEY}
+      - ACCESS_PASSWORD=${ACCESS_PASSWORD}
     restart: always
