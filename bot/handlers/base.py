@@ -25,20 +25,24 @@ START_MESSAGE = (
 Ты можешь общаться со мной здесь или добавить меня в группу.\n\n\
 Просто напиши мне, отправь изображение указав в подписи, что нужно сделать или перешли мне аудиосообщение.\n\n\
 Если добавить меня в группу, я буду отслеживать аудиосообщения и автоматически переводить их в текст.\n\n\
-Чтобы я ответил в группе, начни сообщение с обращения ко мне @{bot_username} или задай вопрос в ответе на моё сообщение!\n\n\
-Но для начала нажми кнопку "ПОЛУЧИТЬ ДОСТУП" и введи пароль.'
+Чтобы я ответил в группе, начни сообщение с обращения ко мне @{bot_username} или задай вопрос в ответе на моё сообщение!\n\n'
 )
-
+ACCES_MESSAGE = "Но для начала нажми кнопку \"ПОЛУЧИТЬ ДОСТУП\" и введи пароль.'"
 
 @router.message(CommandStart())
 async def cmd_start(message: Message):
     logger.info(f"User {message.from_user.id} started bot")
-    await message.answer(
-        START_MESSAGE.format(
+    start_answer = START_MESSAGE.format(
             bot_full_name=message.bot._me.full_name,
             bot_username=message.bot._me.username,
-        ),
-        reply_markup=inline_get_access_keyboard,
+        )
+    reply_markup = None
+    if message.from_user.id not in settings.AUTHORIZED_USERS_ID:
+        start_answer += ACCES_MESSAGE
+        reply_markup=inline_get_access_keyboard
+    await message.answer(
+        start_answer,
+        reply_markup=reply_markup,
     )
 
 
@@ -46,7 +50,6 @@ async def cmd_start(message: Message):
 async def request_password(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_reply_markup(reply_markup=None)
     await callback.message.answer("Введите пароль:")
-    # await callback.answer()  # Acknowledge the callback query
     await state.set_state(AuthStates.waiting_for_password)
 
 
