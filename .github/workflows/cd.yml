@@ -48,5 +48,6 @@ jobs:
           REPOSITORY_NAME: ${{ github.event.repository.name }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          ACCESS_PASSWORD: ${{ secrets.ACCESS_PASSWORD }}
         run: docker compose up -d
 
