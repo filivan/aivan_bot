@@ -103,7 +103,7 @@ async def image_completion(text: str | None, image_url: str) -> str:
     """
     logger.info(
         "Send image and text to Groq chat completion vision {model} model",
-        model=settings.CHAT_COMPLETION_MODEL,
+        model=settings.VISION_MODEL,
     )
     try:
         completion = await client.chat.completions.create(
