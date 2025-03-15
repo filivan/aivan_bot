@@ -41,7 +41,7 @@ async def transcribe_voice(file_io: io.BytesIO) -> str:
     return transcription.text
 
 
-async def chat_completion(text: str) -> str:
+async def chat_completion(text: str, context: str | None = None) -> str:
     """
     Completes a chat using the Groq API.
 
@@ -60,12 +60,17 @@ async def chat_completion(text: str) -> str:
         "Send text to Groq chat completion {model} model",
         model=settings.CHAT_COMPLETION_MODEL,
     )
+    if context is not None:
+        additional_content = f"The user replied to the message, perhaps he answered something from that message '{context}'"
     try:
         completion = await client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
-                    "content": "you are a helpful assistant. If it needed, format content with MARKDOWN",
+                    "content": "you are a helpful assistant. If it needed, format content with MARKDOWN. "
+                    + additional_content
+                    if context is not None
+                    else "",
                 },
                 {
                     "role": "user",
@@ -74,6 +79,8 @@ async def chat_completion(text: str) -> str:
             ],
             model=settings.CHAT_COMPLETION_MODEL,
             stream=False,
+            temperature=0.6,
+            reasoning_format="hidden",
         )
     except Exception as e:
         logger.exception(f"An error occurred while sending text to Groq: {str(e)}")
@@ -124,7 +131,7 @@ async def image_completion(text: str | None, image_url: str) -> str:
                     ],
                 },
             ],
-            model=settings.CHAT_COMPLETION_MODEL,
+            model=settings.VISION_MODEL,
             stream=False,
         )
     except Exception as e:
@@ -132,6 +139,6 @@ async def image_completion(text: str | None, image_url: str) -> str:
         return "An error occurred while sending text to Groq"
     logger.info(
         "Get completion from Groq chat completion {model} model",
-        model=settings.CHAT_COMPLETION_MODEL,
+        model=settings.VISION_MODEL,
     )
     return completion.choices[0].message.content
