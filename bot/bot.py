@@ -11,6 +11,7 @@ async def main() -> None:
     Main entry point for the bot. Create a Bot and Dispatcher, include
     all routers and start polling.
     """
+    print(settings.BOT_TOKEN)
     bot = Bot(token=settings.BOT_TOKEN)
     dp = Dispatcher()
     dp.update.middleware(AuthMiddleware())
