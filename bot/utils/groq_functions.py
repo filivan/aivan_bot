@@ -24,19 +24,19 @@ async def transcribe_voice(file_io: io.BytesIO) -> str:
         str: The transcribed text if successful, or an error message if an exception occurs.
     """
     logger.info(
-        "Send binary-voice file to Groq {model} model", model=settings.SPEECH_MODEL
+        "Send binary-voice file to Groq {model} model", model=settings.SPEECH_TEXT_MODEL
     )
     try:
         transcription = await client.audio.transcriptions.create(
             file=("voice.ogg", file_io),
-            model=settings.SPEECH_MODEL,
+            model=settings.SPEECH_TEXT_MODEL,
             language="ru",
         )
     except Exception as e:
         logger.exception(f"An error occurred while sending audio to Groq: {str(e)}")
         return "An error occurred while sending audio to Groq"
     logger.info(
-        "Get transcription from Groq {model} model", model=settings.SPEECH_MODEL
+        "Get transcription from Groq {model} model", model=settings.SPEECH_TEXT_MODEL
     )
     return transcription.text
 
@@ -67,7 +67,7 @@ async def chat_completion(text: str, context: str | None = None) -> str:
             messages=[
                 {
                     "role": "system",
-                    "content": "you are a helpful assistant. If it needed, format content with MARKDOWN. "
+                    "content": "You are a helpful assistant. Format the response in MARKDOWN."
                     + additional_content
                     if context is not None
                     else "",
@@ -79,8 +79,6 @@ async def chat_completion(text: str, context: str | None = None) -> str:
             ],
             model=settings.CHAT_COMPLETION_MODEL,
             stream=False,
-            temperature=0.6,
-            reasoning_format="hidden",
         )
     except Exception as e:
         logger.exception(f"An error occurred while sending text to Groq: {str(e)}")
@@ -112,6 +110,7 @@ async def image_completion(text: str | None, image_url: str) -> str:
         "Send image and text to Groq chat completion vision {model} model",
         model=settings.VISION_MODEL,
     )
+    text = text if text is not None else "What's in this image?"
     try:
         completion = await client.chat.completions.create(
             messages=[
@@ -121,7 +120,7 @@ async def image_completion(text: str | None, image_url: str) -> str:
                         {
                             # The text to be completed
                             "type": "text",
-                            "text": "What's in this image?" if not text else text,
+                            "text": text + "\\nFormat the response in MARKDOWN.",
                         },
                         {
                             # The URL of the image to be completed
